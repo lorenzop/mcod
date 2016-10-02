@@ -28,8 +28,8 @@ var GState GlobalState
 func main() {
 	GState = GlobalState{}
 	GState.EndServerState = "Offline"
-	listenport := flag.String("listen", ":25565", "The port / IP combo you want to listen on")
-	GState.BackendHost = flag.String("backend", "localhost:25567", "The IP address that the MC server listens on when it's online")
+	listenport := flag.String("listen", ":25565", "The host/port to listen on for incoming connections")
+	GState.BackendHost = flag.String("backend", "localhost:25567", "The host/port of the minecraft server to forward connections to")
 	flag.Parse()
 
 	lis, err := net.Listen("tcp", *listenport)
@@ -255,13 +255,13 @@ func KillTimer(minutes int) {
 }
 
 func RunStartScript() {
-	log.Printf("Starting Server Script")
+	log.Print("Starting minecraft server..")
 	cmd := exec.Command("./StartServer")
 	err := cmd.Start()
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Waiting for command to finish...")
+	log.Printf("Waiting for server startup..")
 	err = cmd.Wait()
 	log.Printf("Server online")
 	GState.EndServerState = "Online"
