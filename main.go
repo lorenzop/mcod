@@ -25,11 +25,14 @@ type GlobalState struct {
 
 var GState GlobalState
 
+var InactiveTimeout *int
+
 func main() {
 	GState = GlobalState{}
 	GState.EndServerState = "Offline"
 	listenport := flag.String("listen", ":25565", "The host/port to listen on for incoming connections")
 	GState.BackendHost = flag.String("backend", "localhost:25567", "The host/port of the minecraft server to forward connections to")
+	InactiveTimeout = flag.Int("timeout", 10, "Idle time in minutes before the server shuts down")
 	flag.Parse()
 
 	lis, err := net.Listen("tcp", *listenport)
@@ -266,8 +269,8 @@ func RunStartScript() {
 	log.Printf("Server online")
 	GState.EndServerState = "Online"
 
-	// Set command to shut down server in 5 minutes if no one connects
-	go KillTimer(5)
+	// Set command to shut down server in X minutes if no one connects
+	go KillTimer(*InactiveTimeout)
 }
 
 func LazyHandle(err error) {
